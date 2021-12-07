@@ -86,7 +86,9 @@ class GraphSerializer extends AbstractNormalizer implements ContextAwareNormaliz
                     // Detect the correct edge by name
                     $edge = null;
                     foreach ($vertex->getEdges() as $item) {
-                        $edge = $edge ? $edge : ($item->getAttribute("name") === $property ? $item : null);
+                        if (!$edge) {
+                            $edge = $item->getAttribute("name") === $property ? $item : null;
+                        }
                     }
 
                     // Let's insert only the non-object nodes
@@ -150,27 +152,30 @@ class GraphSerializer extends AbstractNormalizer implements ContextAwareNormaliz
                 // Detect the correct edge by name
                 $edge = null;
                 foreach ($vertex->getEdges() as $item) {
-                    $edge = $edge ? $edge : ($item->getAttribute("name") === $property ? $item : null);
+                    if (!$edge) {
+                        $edge = $item->getAttribute("name") === $property ? $item : null;
+                    }
                 }
 
                 if ($edge) {
-                    if (method_exists($result, "set" . ucfirst($property))) {
-                        if ($edge->getAttribute("class")) {
-                            if ($value === null) {
-                                $result->{"set" . ucfirst($property)}(null);
-                            } else {
-                                $result->{"set" . ucfirst($property)}(
-                                    $this->denormalizer->denormalize(
-                                        $value,
-                                        $edge->getAttribute("class"),
-                                        $format,
-                                        $context
-                                    )
-                                );
-                            }
+                    if (
+                        method_exists($result, "set" . ucfirst($property)) &&
+                        $edge->getAttribute("class")
+                    ) {
+                        if ($value === null) {
+                            $result->{"set" . ucfirst($property)}(null);
                         } else {
-                            $result->{"set" . ucfirst($property)}($value);
+                            $result->{"set" . ucfirst($property)}(
+                                $this->denormalizer->denormalize(
+                                    $value,
+                                    $edge->getAttribute("class"),
+                                    $format,
+                                    $context
+                                )
+                            );
                         }
+                    } else {
+                        $result->{"set" . ucfirst($property)}($value);
                     }
                 }
             }
@@ -183,13 +188,15 @@ class GraphSerializer extends AbstractNormalizer implements ContextAwareNormaliz
     protected function circularReferenceHandler($object): bool|string
     {
         if (get_class($object)) {
+            $returnValue = null;
             if (method_exists($object, "getId")) {
-                return get_class($object)."(#".($object->getId() ? $object->getId() : "null").")";
+                $returnValue = get_class($object)."(#".($object->getId() ? $object->getId() : "null").")";
             } else if ($object instanceof Stringable) {
-                return get_class($object)."(#".(string)$object.")";
+                $returnValue = get_class($object)."(#".(string)$object.")";
             } else {
-                return get_class($object);
+                $returnValue = get_class($object);
             }
+            return $returnValue;
         } else {
             return (string)$object;
         }

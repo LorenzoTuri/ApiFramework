@@ -16,7 +16,7 @@ class EntityValidationException extends Exception {
             if ($validationError->getConstraint()->getTargets() === Constraint::CLASS_CONSTRAINT) {
                 $errors[] = [
                     "path" => "$entityName.".$validationError->getPropertyPath(),
-                    "message" => $validationError->getMessage()
+                    "message" => "CLASS: " . $validationError->getMessage()
                 ];
             } else {
                 $errors[] = [
