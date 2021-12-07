@@ -1,0 +1,25 @@
+{
+	"name": "lturi/api-framework",
+	"description": "Container of a lot of functionalities api-related, usable in other projects",
+	"type": "library",
+	"license": "proprietary",
+	"authors": [{
+		"email": "lorenzoturi1994@gmail.com",
+		"name": "Lorenzo Turi"
+	}],
+	"autoload": {
+		"psr-4": {
+			"Lturi\\ApiFramework\\": "/"
+		}
+	},
+	"version": "1.0.0",
+	"minimum-stability": "stable",
+	"require": {
+		"php": ">=7.4",
+		"ext-json": "*",
+		"clue/graph": "^0.9.2",
+		"doctrine/annotations": ">=1.13",
+		"doctrine/reflection": "^1.2",
+		"symfony/property-info": "5.*"
+	}
+}
